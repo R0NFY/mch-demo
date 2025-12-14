@@ -13,6 +13,10 @@ function requiredEnv(name: string): string {
   return value;
 }
 
+function getRegion(): string {
+  return process.env.YANDEX_REGION ?? "ru-central1";
+}
+
 export function getS3Client() {
   const accessKeyId = requiredEnv("YANDEX_ACCESS_KEY_ID");
   const secretAccessKey = requiredEnv("YANDEX_SECRET_ACCESS_KEY");
@@ -21,7 +25,7 @@ export function getS3Client() {
     /\/+$/,
     ""
   );
-  const region = process.env.YANDEX_REGION ?? "ru-central1";
+  const region = getRegion();
 
   return new S3Client({
     region,
@@ -41,6 +45,7 @@ function isBucketMissingError(err: unknown): boolean {
 
 export async function ensureBucketExists(bucketName: string) {
   const s3 = getS3Client();
+  const region = getRegion();
   try {
     await s3.send(new HeadBucketCommand({ Bucket: bucketName }));
     return;
@@ -48,7 +53,13 @@ export async function ensureBucketExists(bucketName: string) {
     if (!isBucketMissingError(err)) throw err;
   }
 
-  await s3.send(new CreateBucketCommand({ Bucket: bucketName }));
+  await s3.send(
+    new CreateBucketCommand({
+      Bucket: bucketName,
+      // Yandex requires LocationConstraint and rejects an empty config with UnknownError.
+      CreateBucketConfiguration: { LocationConstraint: region },
+    })
+  );
 }
 
 export async function uploadObject(args: {
