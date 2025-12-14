@@ -1,0 +1,10 @@
+node_modules
+.env.local
+.env
+.env.*.local
+.next
+.DS_Store
+
+# Local Yandex service account key file (if you store it as a file)
+authorized_key*.json
+.DS_Store

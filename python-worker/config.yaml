@@ -1,0 +1,15 @@
+name: uhp-profile-worker
+description: Universal Human Profiler (VVS) DataSphere worker
+resources:
+  cores: 1
+  memory_gb: 4
+  # gpu: 0
+python:
+  version: "3.10"
+  requirements:
+    - oceanai
+    - tensorflow
+    - numpy
+    - boto3
+    - openai
+

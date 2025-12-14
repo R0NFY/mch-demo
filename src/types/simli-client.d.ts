@@ -1,0 +1,2 @@
+declare module "simli-client";
+
